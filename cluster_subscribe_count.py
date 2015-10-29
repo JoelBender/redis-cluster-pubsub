@@ -55,7 +55,7 @@ def main():
             port = int(port)
 
         if not IPv4.match(host):
-            raise ValueError, "host specification must be an IPv4 address"
+            raise ValueError("host specification must be an IPv4 address")
 
         startup_nodes.append({'host': host, 'port': port})
 
