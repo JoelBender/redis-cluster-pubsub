@@ -5,26 +5,28 @@ cluster_subscribe_count
 """
 
 import sys
-import time
-import logging
+import re
 
 from argparse import ArgumentParser
 
 import rediscluster
 
 # configuration parameters
-HOST = ['localhost:6379']
+HOST = ['127.0.0.1:6379']
 CHANNEL = 'chat'
 
 # connection to Redis
 r = None
 args = None
 
+# IPv4 pattern
+IPv4 = re.compile(r"^\d+[.]\d+[.]\d+[.]\d+$")
+
 #
 #   __main__
 #
 
-try:
+def main():
     # parse the command line arguments
     parser = ArgumentParser(description=__doc__)
 
@@ -47,9 +49,13 @@ try:
     for host_port in args.host:
         if ':' not in host_port:
             host = host_port
-            port = '6379'
+            port = 6379
         else:
             host, port = host_port.split(':')
+            port = int(port)
+
+        if not IPv4.match(host):
+            raise ValueError, "host specification must be an IPv4 address"
 
         startup_nodes.append({'host': host, 'port': port})
 
@@ -84,9 +90,6 @@ try:
 
             message_id = current_message_id
 
-except Exception, e:
-    sys.exit(1)
-
-finally:
-    sys.exit(0)
+if __name__ == "__main__":
+    main()
 
